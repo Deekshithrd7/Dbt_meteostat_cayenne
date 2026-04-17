@@ -1,28 +1,31 @@
 WITH flights AS (
     SELECT *
-    FROM prep_flights
+    FROM {{ ref('prep_flights') }}
 ),
 
 airports AS (
     SELECT *
-    FROM prep_airports
+    FROM {{ ref('prep_airports') }}
 ),
 
 weather AS (
     SELECT *
-    FROM prep_weather_daily
+    FROM {{ ref('prep_weather_daily') }}
 ),
 
--- only airports that exist in weather table
+--  Keep only airports that have weather data
 selected_airports AS (
     SELECT DISTINCT airport_code AS faa
     FROM weather
 ),
 
--- Convert flights into airport-day level (departures + arrivals)
+-- Convert flight table into "airport perspective"
+-- One flight becomes TWO rows:
+-- 1 row for departure airport, 1 row for arrival airport
+
 flights_union AS (
 
-    -- departures
+    -- Departure view (origin airport perspective)
     SELECT
         origin AS faa,
         flight_date AS date,
@@ -37,7 +40,7 @@ flights_union AS (
 
     UNION ALL
 
-    -- arrivals
+    -- Arrival view (destination airport perspective)
     SELECT
         dest AS faa,
         flight_date AS date,
@@ -51,37 +54,44 @@ flights_union AS (
     FROM flights
 ),
 
---  flight metrics per airport per day
+-- Step 4: Aggregate flight activity per airport per day
 flight_stats AS (
     SELECT
         f.faa,
         f.date,
 
+        -- how many unique routes from this airport (departures)
         COUNT(DISTINCT CASE WHEN is_departure = 1 THEN connection_airport END)
             AS unique_departure_connections,
 
+        -- how many unique routes into this airport (arrivals)
         COUNT(DISTINCT CASE WHEN is_arrival = 1 THEN connection_airport END)
             AS unique_arrival_connections,
 
+        -- total flight records (both directions)
         COUNT(*) AS total_flights_planned,
 
+        -- disruptions
         SUM(CASE WHEN cancelled = 1 THEN 1 ELSE 0 END) AS total_cancelled,
         SUM(CASE WHEN diverted = 1 THEN 1 ELSE 0 END) AS total_diverted,
 
+        -- actual flights that happened
         SUM(CASE WHEN cancelled = 0 THEN 1 ELSE 0 END) AS total_actual_flights,
 
+        -- operational diversity
         COUNT(DISTINCT tail_number) AS unique_airplanes,
         COUNT(DISTINCT airline) AS unique_airlines
 
     FROM flights_union f
 
+    -- only keep airports that exist in weather dataset
     INNER JOIN selected_airports sa
         ON f.faa = sa.faa
 
     GROUP BY f.faa, f.date
 ),
 
--- join with airports and weather
+-- add airport + weather 
 final AS (
     SELECT
         fs.faa,
@@ -91,6 +101,7 @@ final AS (
 
         fs.date,
 
+        -- flight metrics
         fs.unique_departure_connections,
         fs.unique_arrival_connections,
         fs.total_flights_planned,
@@ -99,6 +110,8 @@ final AS (
         fs.total_actual_flights,
         fs.unique_airplanes,
         fs.unique_airlines,
+
+        -- weather metrics
         w.min_temp_c,
         w.max_temp_c,
         w.precipitation_mm,
@@ -109,9 +122,11 @@ final AS (
 
     FROM flight_stats fs
 
+    -- airport info
     LEFT JOIN airports a
         ON fs.faa = a.faa
 
+    -- weather info (join by airport + date)
     LEFT JOIN weather w
         ON fs.faa = w.airport_code
        AND fs.date = w.date::DATE

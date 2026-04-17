@@ -53,4 +53,4 @@ FROM weather_with_week
 GROUP BY airport_code, week_start
 
 -- Sort output for easy reading and analysis
-ORDER BY airport_code, week_start;
+ORDER BY airport_code, week_start

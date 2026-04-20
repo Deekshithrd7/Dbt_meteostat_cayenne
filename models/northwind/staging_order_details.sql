@@ -1,6 +1,6 @@
 WITH source_data AS (
     SELECT *
-    FROM {{ source('northwind', 'order_details') }}
+    FROM {{ source('northwind_data', 'order_details') }}
 )
 SELECT
     orderid AS order_id

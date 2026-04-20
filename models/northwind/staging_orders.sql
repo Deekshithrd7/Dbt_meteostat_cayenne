@@ -1,6 +1,6 @@
 WITH source_data AS (
     SELECT *
-    FROM {{ source('northwind', 'orders') }}
+    FROM {{ source('northwind_data', 'orders') }}
 )
 SELECT
     orderid AS order_id
@@ -12,7 +12,7 @@ SELECT
     ,shipvia AS ship_via
 	,freight
 	,shipname AS ship_name
-	,shipadress AS ship_address
+	,shipaddress AS ship_address
     ,shipcity AS ship_city
 	,shipregion AS ship_region
 	,shippostalcode AS ship_postalcode

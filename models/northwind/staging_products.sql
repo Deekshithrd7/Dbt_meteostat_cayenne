@@ -1,5 +1,5 @@
 with source_data as (
-    select * from {{source('northwind','products')}}
+    select * from {{source('northwind_data','products')}}
 )
 select 
      productid AS product_id

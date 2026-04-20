@@ -1,7 +1,7 @@
 version: 2
 sources:
 
-- name: northwind_data
+- name: northwind
   schema: northwind
   tables:
     - name: orders

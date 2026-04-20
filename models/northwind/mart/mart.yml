@@ -1,0 +1,29 @@
+version: 2
+
+models:
+
+  - name: mart_sales_performance
+    description: >
+      Monthly sales performance aggregated by product category.
+    columns:
+
+      - name: order_year
+        description: "Year when the order was placed"
+
+      - name: order_month
+        description: "Month when the order was placed"
+
+      - name: category_name
+        description: "Product category (e.g., Beverages, Seafood)"
+
+      - name: total_revenue
+        description: >
+          sum of revenue generated per category per month:
+          sum of all line-item revenues
+
+      - name: total_orders
+        description: "Number of unique orders in each category per month"
+
+      - name: avg_revenue_per_order
+        description: >
+          Average revenue per order for a given category and time period

@@ -1,0 +1,104 @@
+version: 2
+
+models:
+
+
+  - name: staging_orders
+    description: "Cleaned orders data from northwind schema on postgres"
+
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order"
+        tests:
+          - not_null
+          - unique
+
+      - name: customer_id
+        description: "ID of the customer who placed the order"
+        tests:
+          - not_null
+
+      - name: employee_id
+        description: "Employee who was responsible for the order"
+
+      - name: order_date
+        description: "Date when the order was placed"
+
+      - name: shipped_date
+        description: "Date when the order was shipped"
+
+      - name: ship_country
+        description: "Country where the order was shipped"
+
+
+
+  - name: staging_order_details
+    description: "Line-level details for each order (products, quantity, price)"
+
+    columns:
+      - name: order_id
+        description: "Order identifier for each order"
+        tests:
+          - not_null
+
+      - name: product_id
+        description: "Product identifier for each product"
+        tests:
+          - not_null
+
+      - name: quantity
+        description: "Number of units ordered"
+
+      - name: unit_price
+        description: "Price per unit of the product"
+
+      - name: discount
+        description: "Discount applied to the product"
+
+
+  
+  - name: staging_products
+    description: "Product data including pricing and stock"
+
+    columns:
+      - name: product_id
+        description: "Unique identifier for each product"
+        tests:
+          - not_null
+          - unique
+
+      - name: product_name
+        description: "Name of the product"
+
+      - name: supplier_id
+        description: "Supplier providing the product"
+
+      - name: category_id
+        description: "Category to which the product belongs"
+
+      - name: unit_price
+        description: "Price per unit"
+
+      - name: units_in_stock
+        description: "Number of units currently in stock"
+
+      - name: discontinued
+        description: "Flag indicating if the product is discontinued"
+
+
+
+  - name: staging_categories
+    description: "Product categories and their descriptions"
+
+    columns:
+      - name: category_id
+        description: "Unique identifier for each category"
+        tests:
+          - not_null
+          - unique
+
+      - name: category_name
+        description: "Name of the category"
+
+      - name: description
+        description: "Description of the category"

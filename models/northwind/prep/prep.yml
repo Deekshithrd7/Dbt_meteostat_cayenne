@@ -1,0 +1,45 @@
+version: 2
+
+models:
+
+  - name: prep_sales
+    description: >
+      This model combines orders, order details, products, and categories
+      into a single unified sales dataset. Each row represents a single
+      product line in an order with calculated revenue and time attributes.
+
+    columns:
+
+      - name: order_id
+        description: "Unique identifier for each order"
+        tests:
+          - not_null
+
+      - name: customer_id
+        description: "Customer who placed the order"
+
+      - name: product_name
+        description: "Name of the product sold"
+
+      - name: category_name
+        description: "Category of the product (e.g. Beverages, Seafood)"
+
+      - name: unit_price
+        description: "Price per unit at time of sale"
+
+      - name: quantity
+        description: "Number of units purchased in the order"
+
+      - name: discount
+        description: "Discount applied to the product line"
+
+      - name: revenue
+        description: >
+          Final revenue for the line item after discount:
+          unit_price × quantity × (1 - discount)
+
+      - name: order_year
+        description: "Year extracted from the order date"
+
+      - name: order_month
+        description: "Month extracted from the order date"
